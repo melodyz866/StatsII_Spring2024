@@ -1,0 +1,15 @@
+Analysis of Deviance Table
+
+Model: binomial, link: logit
+
+Response: choice
+
+Terms added sequentially (first to last)
+
+
+          Df Deviance Resid. Df Resid. Dev  Pr(>Chi)    
+NULL                       8499      11783              
+countries  2  146.724      8497      11637 < 2.2e-16 ***
+sanctions  3   68.426      8494      11568 9.272e-15 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1

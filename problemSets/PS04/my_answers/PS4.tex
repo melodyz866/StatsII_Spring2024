@@ -1,0 +1,138 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage{graphicx,textcomp}
+\usepackage{natbib}
+\usepackage{setspace}
+\usepackage{fullpage}
+\usepackage{color}
+\usepackage[reqno]{amsmath}
+\usepackage{amsthm}
+\usepackage{fancyvrb}
+\usepackage{amssymb,enumerate}
+\usepackage[all]{xy}
+\usepackage{endnotes}
+\usepackage{lscape}
+\newtheorem{com}{Comment}
+\usepackage{float}
+\usepackage{hyperref}
+\newtheorem{lem} {Lemma}
+\newtheorem{prop}{Proposition}
+\newtheorem{thm}{Theorem}
+\newtheorem{defn}{Definition}
+\newtheorem{cor}{Corollary}
+\newtheorem{obs}{Observation}
+\usepackage[compact]{titlesec}
+\usepackage{dcolumn}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usepackage{multirow}
+\usepackage{xcolor}
+\newcolumntype{.}{D{.}{.}{-1}}
+\newcolumntype{d}[1]{D{.}{.}{#1}}
+\definecolor{light-gray}{gray}{0.65}
+\usepackage{url}
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+	backgroundcolor=\color{backcolour},   
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\footnotesize,
+	breakatwhitespace=false,         
+	breaklines=true,                 
+	captionpos=b,                    
+	keepspaces=true,                 
+	numbers=left,                    
+	numbersep=5pt,                  
+	showspaces=false,                
+	showstringspaces=false,
+	showtabs=false,                  
+	tabsize=2
+}
+\lstset{style=mystyle}
+\newcommand{\Sref}[1]{Section~\ref{#1}}
+\newtheorem{hyp}{Hypothesis}
+
+\title{Problem Set 4}
+\date{Due: April 12, 2024}
+\author{Applied Stats II}
+
+
+\begin{document}
+	\maketitle
+	\section*{Instructions}
+	\begin{itemize}
+	\item Please show your work! You may lose points by simply writing in the answer. If the problem requires you to execute commands in \texttt{R}, please include the code you used to get your answers. Please also include the \texttt{.R} file that contains your code. If you are not sure if work needs to be shown for a particular problem, please ask.
+	\item Your homework should be submitted electronically on GitHub in \texttt{.pdf} form.
+	\item This problem set is due before 23:59 on Friday April 12, 2024. No late assignments will be accepted.
+
+	\end{itemize}
+
+	\vspace{.25cm}
+\section*{Question 1}
+\vspace{.25cm}
+\noindent We're interested in modeling the historical causes of child mortality. We have data from 26855 children born in Skellefteå, Sweden from 1850 to 1884. Using the "child" dataset in the \texttt{eha} library, fit a Cox Proportional Hazard model using mother's age and infant's gender as covariates. Present and interpret the output.
+
+\begin{lstlisting}[language=R] 
+# load libaries
+library(eha)
+library(survival)
+
+data(child)
+
+# Fit the Cox Proportional Hazards model
+cox_model <- coxph(Surv(enter,exit,event) ~ m.age + sex, data = child)
+
+plot_cox<-coxreg(Surv(enter,exit,event) ~ m.age + sex, data = child)
+
+plot(plot_cox)
+
+# Display the model summary
+summary(cox_model)
+
+\end{lstlisting} 
+\newpage
+\begin{verbatim}
+  n= 26574, number of events= 5616 
+
+               coef exp(coef)  se(coef)      z Pr(>|z|)    
+m.age      0.007617  1.007646  0.002128  3.580 0.000344 ***
+sexfemale -0.082215  0.921074  0.026743 -3.074 0.002110 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+          exp(coef) exp(-coef) lower .95 upper .95
+m.age        1.0076     0.9924     1.003    1.0119
+sexfemale    0.9211     1.0857     0.874    0.9706
+
+Concordance= 0.519  (se = 0.004 )
+Likelihood ratio test= 22.52  on 2 df,   p=1e-05
+Wald test            = 22.52  on 2 df,   p=1e-05
+Score (logrank) test = 22.53  on 2 df,   p=1e-05
+\end{verbatim}
+\begin{figure}[ht]
+\centering
+\includegraphics[width=1.0\textwidth]{Screenshot 2024-04-09 at 15.54.41.png}
+\caption{plotting cumulative hazard function}
+\label{}
+\end{figure}
+
+\vspace{2cm}
+\begin{itemize}
+    \item The coefficient for the mother's age is 0.007617. A positive value indicates an increased hazard (risk) for the event of an infant's death when the covariate increases by one unit. The 95\% confidence interval of the hazard ratio ranges from 1.003 to 1.0119. When holding other variables constant, with each additional year of the mother's age, the hazard of the event happening increases by a factor of 1.007646 (hazard ratio) and the effect is statistically significant. This hazard ratio suggests that for each additional year of the mother's age, the risk of the mortality event happening increases by 0.7646\%.
+    \item exp(-coef) for the mother's age is 0.9924, which means that for each one-year decrease in the mother's age, the risk of child mortality is multiplied by 0.9924, or decreases by approximately 0.76\% (since 1 - 0.9924 = 0.0076 or 0.76\%). It's the reciprocal effect of a one-unit increase in the mother's age.
+
+    \item The coefficient for being female (sex) is -0.082215,  the negative sign refers to being female is associated with a decrease in the hazard (or risk) of the event happening, compared to the man ( baseline category).  The 95\% confidence interval of the hazard ratio is between 0.874 and 0.9706,  the hazard ratio is 0.921074 indicating when holding other variables constant, female infants have a 7.8926\% (1 - 0.921074) lower hazard of the mortality event occurring at any given time compared to male infants.
+
+    \item exp(-coef) for the female is 1.0857,  the opposite direction of the original coefficient: males have an 8.57\% higher hazard of the event occurring compared to females, assuming all other factors are constant. 
+    \item The concordance index is 0.519, indicating the model's predictive ability is a bit better than by chance. (1 suggests perfect, 0.5 equal by random chance)
+    \end{itemize}
+ 
+\end{document}
